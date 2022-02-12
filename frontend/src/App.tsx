@@ -4,7 +4,8 @@ import Header from "./Components/Headers";
 import Products from "./Components/ProductTypes/Products";
 import Items from "./Components/ProductTypes/Items";
 import Context from "./Context";
-import Navigation from "./Navigation";
+import Navigation from "./Components/Navigation/Navigation";
+import Main from "./Components/Main/Main";
 
 import styles from "./App.module.scss";
 
@@ -83,7 +84,7 @@ const App = () => {
   return (
     <div className={styles.App}>
       <Navigation />
-        <Main />
+       
       <div className={styles.container}>
         <Header />
         {linkSuccess && isItemAccess && (

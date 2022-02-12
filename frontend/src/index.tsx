@@ -8,12 +8,13 @@ import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
+    <BrowserRouter>
     <QuickstartProvider>
-      <BrowserRouter>
+      
         <App />
-      </BrowserRouter>
       
     </QuickstartProvider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
