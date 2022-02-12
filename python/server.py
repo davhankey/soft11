@@ -322,6 +322,7 @@ def get_transactions():
             options=options
         )
         response = client.transactions_get(request)
+        addAuth(response['transactions'])
         pretty_print_response(response.to_dict())
         return jsonify(response.to_dict())
     except plaid.ApiException as e:
