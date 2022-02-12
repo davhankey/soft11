@@ -53,6 +53,7 @@ import json
 import time
 from dotenv import load_dotenv
 from werkzeug.wrappers import response
+import sqlite3
 load_dotenv()
 
 
@@ -242,6 +243,13 @@ def get_access_token():
 # Retrieve ACH or ETF account numbers for an Item
 # https://plaid.com/docs/#auth
 
+def db_connection():
+    conn=None
+    try:
+        conn = sqlite3.connect('Financial_Management.sqlite')
+    except sqlite3.error as er:
+        print(er)
+    conn =db_connection()
 
 @app.route('/api/auth', methods=['GET'])
 def get_auth():
@@ -250,13 +258,52 @@ def get_auth():
             access_token=access_token
         )
        response = client.auth_get(request)
-       pretty_print_response(response.to_dict())
+       response_dict =response.to_dict()
+       #print("Output -> ",response['accounts'][0]['account_id'])
+       #print("Output -> ",response['accounts'][1]['account_id'])
+       #call function to create database
+       addAuth(response['accounts'])
+       #pretty_print_response(response.to_dict())
+       
        return jsonify(response.to_dict())
     except plaid.ApiException as e:
         error_response = format_error(e)
         return jsonify(error_response)
 
+def addAuth(accounts=[]):
+    conn = db_connection
+    for account in accounts:
+        #add each account to database
+        try:  
+            cur = conn.cursor()  
+            cur.execute("INSERT into Account (account_id,balance,name, subtype, mask) values (?,?,?,?,?)",
+            (account['account_id'],account['balance']['current'],account['name'],account['subtype'],account['mask']))  
+            conn.commit()  
+            msg = "Account successfully Added"  
+        except:  
+            conn.rollback()  
+            msg = "We can not add the employee to the list"  
+        finally:  
+            return "Failed to add Account" 
+    conn.close()  
 
+
+def addTrasaction(transactions=[]):
+    conn = db_connection
+    for transaction in transactions:
+        #add each account to database
+        try:  
+            cur = conn.cursor()  
+            cur.execute("INSERT into Transaction (transaction_id,amount,date, name, account_id) values (?,?,?,?,?)",
+            (transaction['transaction_id'],transaction['amount'],transaction['date'],transaction['name'],transaction['account_id']))  
+            conn.commit()  
+            msg = "Account successfully Added"  
+        except:  
+            conn.rollback()  
+            msg = "We can not add the employee to the list"  
+        finally:  
+            return "Failed to add Transaction" 
+    conn.close() 
 # Retrieve Transactions for an Item
 # https://plaid.com/docs/#transactions
 
@@ -582,5 +629,8 @@ def authorize_and_create_transfer(access_token):
         return jsonify(error_response)
 
 
+
 if __name__ == '__main__':
     app.run(port=os.getenv('PORT', 8000))
+    from . import db
+    db.init_app(app)
