@@ -4,11 +4,15 @@ import App from "./App";
 import { QuickstartProvider } from "./Context";
 import reportWebVitals from "./reportWebVitals";
 import 'semantic-ui-css/semantic.min.css'
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
     <QuickstartProvider>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+      
     </QuickstartProvider>
   </React.StrictMode>,
   document.getElementById("root")
